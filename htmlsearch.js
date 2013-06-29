@@ -44,8 +44,9 @@ function visibleText(nodes) {
 
 function nodeAt(nodeArray, index) {
 	var pos = 0;
+	var node;
 	for (var i = 0; i < nodeArray.length; i++) {
-		var node = nodeArray[i];
+		node = nodeArray[i];
 		var nextPos = pos + node.nodeValue.length;
 		if (index < nextPos) {
 			return [node, index - pos];
@@ -54,7 +55,7 @@ function nodeAt(nodeArray, index) {
 		pos = nextPos;
 	}
 
-	return null;
+	return [node, node.nodeValue.length];
 }
 
 function indexAt(textNodes, range, forward) {

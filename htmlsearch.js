@@ -110,7 +110,11 @@ function find_regex(text, pattern, forward, startOffset) {
 	var index = -1;
 	var wraparound = false;
 
-	var re = new RegExp(pattern, "g");
+	try {
+		var re = new RegExp(pattern, "g");
+	} catch (error) {
+		return null;
+	}
 	re.lastIndex = startOffset;
 	while (true) {
 		/* If an empty string matches, lastIndex is not incremented. */

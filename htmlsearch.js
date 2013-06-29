@@ -161,6 +161,10 @@ function find_regex(text, pattern, forward, startOffset) {
 		}
 	}
 
+	if (index < 0) {
+		return null;
+	}
+
 	return {
 		"startOffset": index,
 		"endOffset": endOffset,

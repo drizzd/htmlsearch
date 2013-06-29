@@ -204,16 +204,37 @@ function select(range) {
 	window.getSelection().addRange(range);
 }
 
-function select_match(regex, pattern, forward) {
+function selectedRange() {
 	var selection = window.getSelection();
-	var startAt = null;
-	if (selection.type != "None") {
-		startAt = selection.getRangeAt(0);
+	if (selection.type == "None") {
+		return null;
 	}
+	return selection.getRangeAt(0);
+}
+
+function compareRange(a, b) {
+	var startsame = a.startContainer == b.startContainer && a.startOffset == b.startOffset;
+	var endsame = a.endContainer == b.endContainer && a.endOffset == b.endOffset;
+	return startsame || endsame;
+}
+
+function select_match(regex, pattern, forward) {
+	var startAt = selectedRange();
 
 	var match = search(regex, pattern, forward, startAt);
-	if (match !== null) {
-		select(match.range)
+	if (match == null) {
+		return null;
+	}
+
+	select(match.range);
+
+	/*
+	 * In case we find a range which cannot be selected properly, restart
+	 * from the beginning.
+	 */
+	if (!compareRange(selectedRange(), match.range)) {
+		window.getSelection().removeAllRanges();
+		match = search(regex, pattern, forward, startAt);
 	}
 
 	return match;

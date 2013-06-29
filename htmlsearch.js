@@ -46,12 +46,12 @@ function nodeAt(nodeArray, index) {
 	var pos = 0;
 	for (var i = 0; i < nodeArray.length; i++) {
 		var node = nodeArray[i];
-		var next_pos = pos + node.nodeValue.length;
-		if (index < next_pos) {
+		var nextPos = pos + node.nodeValue.length;
+		if (index < nextPos) {
 			return [node, index - pos];
 		}
 
-		pos = next_pos;
+		pos = nextPos;
 	}
 
 	return null;
@@ -76,7 +76,7 @@ function indexAt(textNodes, range, forward) {
 	return visibleText(textNodes.slice(0, index)).length + offset;
 }
 
-function find_substring_1(text, pattern, forward, startOffset) {
+function findSubstring1(text, pattern, forward, startOffset) {
 	if (forward) {
 		return text.indexOf(pattern, startOffset);
 	} else {
@@ -88,16 +88,16 @@ function find_substring_1(text, pattern, forward, startOffset) {
 	}
 }
 
-function find_substring(text, pattern, forward, startOffset) {
+function findSubstring(text, pattern, forward, startOffset) {
 	var wraparound = false;
-	var index = find_substring_1(text, pattern, forward, startOffset);
+	var index = findSubstring1(text, pattern, forward, startOffset);
 	if (index < 0) {
 		wraparound = true;
 		startOffset = 0;
 		if (!forward) {
 			startOffset = text.length+1;
 		}
-		index = find_substring_1(text, pattern, forward, startOffset);
+		index = findSubstring1(text, pattern, forward, startOffset);
 	}
 
 	if (index < 0)
@@ -110,7 +110,7 @@ function find_substring(text, pattern, forward, startOffset) {
 	};
 }
 
-function find_regex(text, pattern, forward, startOffset) {
+function findRegex(text, pattern, forward, startOffset) {
 	var index = -1;
 	var endOffset = -1;
 	var wraparound = false;
@@ -172,11 +172,11 @@ function find_regex(text, pattern, forward, startOffset) {
 	};
 }
 
-function find_match(text, regex, pattern, forward, startOffset) {
+function findMatch(text, regex, pattern, forward, startOffset) {
 	if (regex) {
-		return find_regex(text, pattern, forward, startOffset);
+		return findRegex(text, pattern, forward, startOffset);
 	} else {
-		return find_substring(text, pattern, forward, startOffset);
+		return findSubstring(text, pattern, forward, startOffset);
 	}
 }
 
@@ -191,7 +191,7 @@ function search(regex, pattern, forward, startAt) {
 	}
 
 	var text = visibleText(textNodes);
-	var match = find_match(text, regex, pattern, forward, startOffset);
+	var match = findMatch(text, regex, pattern, forward, startOffset);
 	if (match == null) {
 		return null;
 	}
@@ -222,7 +222,7 @@ function compareRange(a, b) {
 	return startsame || endsame;
 }
 
-function select_match(regex, pattern, forward) {
+function selectMatch(regex, pattern, forward) {
 	var startAt = selectedRange();
 
 	var match = search(regex, pattern, forward, startAt);

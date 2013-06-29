@@ -113,6 +113,13 @@ function find_regex(text, pattern, forward, startOffset) {
 	var re = new RegExp(pattern, "g");
 	re.lastIndex = startOffset;
 	while (true) {
+		/* If an empty string matches, lastIndex is not incremented. */
+		var prevLastIndex;
+		if (prevLastIndex !== null && re.lastIndex == prevLastIndex) {
+			re.lastIndex += 1;
+		}
+		prevLastIndex = re.lastIndex;
+
 		var match = re.exec(text);
 
 		if (match == null && startOffset > 0 && !wraparound) {

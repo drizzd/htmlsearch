@@ -69,12 +69,12 @@ function indexAt(textNodes, range, forward) {
 		offset = range.startOffset;
 	}
 
-	var index = textNodes.indexOf(node);
-	if (index < 0) {
+	var nodeIndex = textNodes.indexOf(node);
+	if (nodeIndex < 0) {
 		return 0;
 	}
 
-	return visibleText(textNodes.slice(0, index)).length + offset;
+	return visibleText(textNodes.slice(0, nodeIndex)).length + offset;
 }
 
 function findSubstring1(text, pattern, forward, startOffset) {

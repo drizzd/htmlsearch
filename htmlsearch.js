@@ -65,7 +65,7 @@ function indexAt(textNodes, range, forward) {
 		offset = range.endOffset;
 	} else {
 		node = range.startContainer;
-		offset = range.startOffset - 1;
+		offset = range.startOffset;
 	}
 
 	var index = textNodes.indexOf(node);
@@ -76,45 +76,94 @@ function indexAt(textNodes, range, forward) {
 	return visibleText(textNodes.slice(0, index)).length + offset;
 }
 
-function find_string_1(text, pattern, forward, startOffset) {
+function find_substring_1(text, pattern, forward, startOffset) {
 	if (forward) {
 		return text.indexOf(pattern, startOffset);
 	} else {
-		if (startOffset < 0) {
+		if (startOffset == 0) {
 			return -1;
 		}
-		return text.lastIndexOf(pattern, startOffset);
+		return text.lastIndexOf(pattern, startOffset-1);
 	}
 }
 
-function find_string(text, pattern, forward, startOffset) {
+function find_substring(text, pattern, forward, startOffset) {
 	var wraparound = false;
-	var index = find_string_1(text, pattern, forward, startOffset);
+	var index = find_substring_1(text, pattern, forward, startOffset);
 	if (index < 0) {
 		wraparound = true;
 		startOffset = 0;
 		if (!forward) {
-			startOffset = text.length;
+			startOffset = text.length+1;
 		}
-		var index = find_string_1(text, pattern, forward, startOffset);
+		index = find_substring_1(text, pattern, forward, startOffset);
+	}
+
+	if (index < 0)
+		return null;
+
+	return { "index": index, "wraparound": wraparound };
+}
+
+function find_regex(text, pattern, forward, startOffset) {
+	var index = -1;
+	var wraparound = false;
+
+	var re = new RegExp(pattern, "g");
+	re.lastIndex = startOffset;
+	while (true) {
+		var match = re.exec(text);
+
+		if (match == null && startOffset > 0 && !wraparound) {
+			wraparound = true;
+			match = re.exec(text);
+		}
+		if (match == null) {
+			break;
+		}
+
+		if (forward) {
+			/* Done with the first match. */
+			index = match.index;
+			break;
+		} else if (wraparound && match.index >= startOffset) {
+			/*
+			 * We wrapped around and passed startOffset. We
+			 * already found the first backward match in the
+			 * previous iteration.
+			 */
+			break;
+		} else {
+			/* Keep track of the last match until we pass
+			 * startOffset. */
+			index = match.index;
+		}
 	}
 
 	return { "index": index, "wraparound": wraparound };
 }
 
-function search(pattern, forward, startAt) {
+function find_match(text, regex, pattern, forward, startOffset) {
+	if (regex) {
+		return find_regex(text, pattern, forward, startOffset);
+	} else {
+		return find_substring(text, pattern, forward, startOffset);
+	}
+}
+
+function search(regex, pattern, forward, startAt) {
 	if (forward == null) {
 		forward = true;
 	}
 	var textNodes = visibleTextNodes(document.body);
 	var startOffset = 0;
-	if (startAt != null) {
+	if (startAt !== null) {
 		startOffset = indexAt(textNodes, startAt, forward);
 	}
 
 	var text = visibleText(textNodes);
-	var match = find_string(text, pattern, forward, startOffset);
-	if (match.index < 0) {
+	var match = find_match(text, regex, pattern, forward, startOffset);
+	if (match == null) {
 		return null;
 	}
 
@@ -130,15 +179,15 @@ function select(range) {
 	window.getSelection().addRange(range);
 }
 
-function select_match(pattern, forward) {
+function select_match(regex, pattern, forward) {
 	var selection = window.getSelection();
 	var startAt = null;
 	if (selection.type != "None") {
 		startAt = selection.getRangeAt(0);
 	}
 
-	var match = search(pattern, forward, startAt);
-	if (match != null) {
+	var match = search(regex, pattern, forward, startAt);
+	if (match !== null) {
 		select(match.range)
 	}
 

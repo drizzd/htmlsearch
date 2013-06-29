@@ -103,11 +103,16 @@ function find_substring(text, pattern, forward, startOffset) {
 	if (index < 0)
 		return null;
 
-	return { "index": index, "wraparound": wraparound };
+	return {
+		"startOffset": index,
+		"endOffset": index + pattern.length,
+		"wraparound": wraparound
+	};
 }
 
 function find_regex(text, pattern, forward, startOffset) {
 	var index = -1;
+	var endOffset = -1;
 	var wraparound = false;
 
 	try {
@@ -137,6 +142,7 @@ function find_regex(text, pattern, forward, startOffset) {
 		if (forward) {
 			/* Done with the first match. */
 			index = match.index;
+			endOffset = re.lastIndex;
 			break;
 		} else if (wraparound && match.index >= startOffset) {
 			/*
@@ -146,13 +152,20 @@ function find_regex(text, pattern, forward, startOffset) {
 			 */
 			break;
 		} else {
-			/* Keep track of the last match until we pass
-			 * startOffset. */
+			/*
+			 * Keep track of the last match until we pass
+			 * startOffset.
+			 */
 			index = match.index;
+			endOffset = re.lastIndex;
 		}
 	}
 
-	return { "index": index, "wraparound": wraparound };
+	return {
+		"startOffset": index,
+		"endOffset": endOffset,
+		"wraparound": wraparound
+	};
 }
 
 function find_match(text, regex, pattern, forward, startOffset) {
@@ -180,8 +193,8 @@ function search(regex, pattern, forward, startAt) {
 	}
 
 	var range = document.createRange();
-	range.setStart.apply(range, nodeAt(textNodes, match.index));
-	range.setEnd.apply(range, nodeAt(textNodes, match.index + pattern.length));
+	range.setStart.apply(range, nodeAt(textNodes, match.startOffset));
+	range.setEnd.apply(range, nodeAt(textNodes, match.endOffset));
 
 	return { "range": range, "wraparound": match.wraparound };
 }

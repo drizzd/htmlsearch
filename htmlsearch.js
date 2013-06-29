@@ -80,10 +80,11 @@ function find_substring_1(text, pattern, forward, startOffset) {
 	if (forward) {
 		return text.indexOf(pattern, startOffset);
 	} else {
-		if (startOffset == 0) {
+		var offset = startOffset - pattern.length;
+		if (offset < 0) {
 			return -1;
 		}
-		return text.lastIndexOf(pattern, startOffset-1);
+		return text.lastIndexOf(pattern, offset);
 	}
 }
 

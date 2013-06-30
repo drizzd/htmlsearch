@@ -18,9 +18,9 @@ TODO
 - Support scrolling.
 
 - Strange selection range behavior when matching spaces after the last text
-  node (e.g. between these two end tags: </p>   </body>). This does not happen
-  with window.find. Currently there is a workaround in place which tries to
-  detect this case and restarts the search with an empty selection.
+  node (e.g. between these two end tags: &lt;/p&gt;   &lt;/body&gt;). This does
+  not happen with window.find. Currently there is a workaround in place which
+  tries to detect this case and restarts the search with an empty selection.
 
 - Repeated search with empty matches does not move forward. E.g. with /\b/, or
   with /.*/ on empty nodes, we find the same match over and over again.

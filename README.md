@@ -9,6 +9,8 @@ in window.find.
 TODO
 ----
 
+- Test in browsers other than Chromium 27.
+
 - Implement ignorecase.
 
 - Support in place search directly (used by vimium).
